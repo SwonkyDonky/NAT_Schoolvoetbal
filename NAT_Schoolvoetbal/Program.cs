@@ -1,3 +1,4 @@
+using APiTest;
 using System;
 
 class Program
@@ -96,7 +97,15 @@ class Program
 
     static void Matches()
     {
-        
+        // Add your API call here
+        // Example code:
+        MatchController matchController = new MatchController();
+        string apiResponse = matchController.GetApiResponse();
+
+        Console.WriteLine("API Response:");
+        Console.WriteLine(apiResponse);
+        Console.WriteLine("Press any key to continue...");
+        Console.ReadKey();
     }
 
     // Methode om het wachtwoord in te voeren zonder het weer te geven
