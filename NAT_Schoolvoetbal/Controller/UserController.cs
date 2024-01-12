@@ -52,7 +52,7 @@ public class UserController
     {
         // Logica om een nieuw admin-account te maken en op te slaan in de lokale database
     }
-    public void LogInAccount(string email, string password)
+    public bool LogInAccount(string email, string password, out bool isLoggedIn)
     {
         Console.Clear();
         using (var dbContext = new AppDbContext())
@@ -63,11 +63,15 @@ public class UserController
             // Controleer of de gebruiker niet null is en het wachtwoord overeenkomt
             if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
             {
-                Console.WriteLine($"Welkom, {user.Email}!");
+                Console.WriteLine($"Welkom, {user.Email}! Balans in 4SDollars: {user.Sdollars}");
+                isLoggedIn = true;
+                return true;
             }
             else
             {
                 Console.WriteLine("Ongeldige inloggegevens. Probeer opnieuw.");
+                isLoggedIn = false;
+                return false;
             }
         }
     }
