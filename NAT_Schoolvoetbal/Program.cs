@@ -7,13 +7,15 @@ class Program
 
     static void Main(string[] args)
     {
+        int currentSessionId = 0;
+
         while (true)
         {
             if (isLoggedIn)
             {
                 Console.WriteLine("Kies een optie:");
                 Console.WriteLine("1. 4SDollars inzetten");
-                Console.WriteLine("2. Wedstrijden bekijken");
+                Console.WriteLine("2. Check of je gewonnen hebt!");
                 Console.WriteLine("3. Uitloggen");
 
                 string choice = Console.ReadLine();
@@ -21,15 +23,17 @@ class Program
                 switch (choice)
                 {
                     case "1":
-                        // 4SDollars inzetten
+                        Console.Clear();
+                        Matches(SessionManager.GetSessionUser(currentSessionId), currentSessionId);
                         break;
                     case "2":
                         Console.Clear();
-                        Matches();
+                        Check();
                         break;
                     case "3":
                         Console.Clear();
                         isLoggedIn = false;
+                        SessionManager.RemoveSession(currentSessionId);  // Verwijder de huidige sessie bij uitloggen
                         Console.WriteLine("Uitgelogd.");
                         break;
                     default:
@@ -39,7 +43,6 @@ class Program
             }
             else
             {
-                // Opties voor niet-ingelogde gebruikers
                 Console.WriteLine("Kies een optie:");
                 Console.WriteLine("1. Inloggen");
                 Console.WriteLine("2. Registreren");
@@ -49,11 +52,9 @@ class Program
                 switch (choice)
                 {
                     case "1":
-                        // Inloggen
-                        Login();
+                        Login(out currentSessionId);
                         break;
                     case "2":
-                        // Registreren
                         Register();
                         break;
                     default:
@@ -64,7 +65,7 @@ class Program
         }
     }
 
-    static void Login()
+    static void Login(out int sessionId)
     {
         Console.Clear();
         Console.WriteLine("Inloggen - Voer je gegevens in.");
@@ -76,7 +77,7 @@ class Program
         string pass = ReadPassword();
 
         UserController userController = new UserController();
-        userController.LogInAccount(email, pass, out isLoggedIn);
+        userController.LogInAccount(email, pass, out isLoggedIn, out sessionId);  // Geef de sessie-ID terug
     }
 
     static void Register()
@@ -94,21 +95,39 @@ class Program
         userController.CreateNewAccount(email, pass);
     }
 
-    static void Matches()
+    static void Matches(User currentUser, int sessionId)
     {
         Console.Clear();
 
         // Call the function in MatchController.cs
         MatchController matchController = new MatchController();
-        matchController.GetMatches().Wait();
-        
+        matchController.UpdateDatabaseWithNewMatches().Wait();
+
+        // Choose the match you want to bet on and call the according method in the match controller
         Console.WriteLine("");
-        Console.WriteLine("Druk op enter om door te gaan...");
-        Console.ReadLine();
-        Console.Clear();
+        Console.WriteLine("Op welke wedstrijd wil je 4SDollars inzetten? (typ het exact uit zoals hierboven staat)");
+        string chosenMatch = Console.ReadLine();
+
+        // Get match details from the local database
+        Match selectedMatch = matchController.GetMatchByName(chosenMatch);
+
+        if (selectedMatch != null)
+        {
+            // Call the method to place a bet
+            matchController.PlaceBet(SessionManager.GetSessionUser(sessionId), selectedMatch);
+        }
+        else
+        {
+            Console.WriteLine("Ongeldige wedstrijdkeuze. Probeer opnieuw.");
+        }
     }
 
-    // Methode om het wachtwoord in te voeren zonder het weer te geven
+
+    static void Check()
+    {
+        // Code for checking if you won
+    }
+
     static string ReadPassword()
     {
         string password = "";

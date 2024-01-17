@@ -51,7 +51,7 @@ public class UserController
     {
         // Logica om een nieuw admin-account te maken en op te slaan in de lokale database
     }
-    public bool LogInAccount(string email, string password, out bool isLoggedIn)
+    public bool LogInAccount(string email, string password, out bool isLoggedIn, out int sessionId)
     {
         Console.Clear();
         using (var dbContext = new AppDbContext())
@@ -68,6 +68,12 @@ public class UserController
                 // Reset the console color to default
                 Console.ResetColor();
 
+                // Generate a unique session ID (you can use a more robust method in a production environment)
+                sessionId = Guid.NewGuid().GetHashCode();
+
+                // Store the user session
+                SessionManager.AddSession(sessionId, user);
+
                 isLoggedIn = true;
                 return true;
             }
@@ -75,9 +81,9 @@ public class UserController
             {
                 Console.WriteLine("Ongeldige inloggegevens. Probeer opnieuw.");
                 isLoggedIn = false;
+                sessionId = 0;
                 return false;
             }
         }
     }
-
 }
