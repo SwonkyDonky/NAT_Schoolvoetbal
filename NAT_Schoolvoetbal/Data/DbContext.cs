@@ -4,7 +4,7 @@ public class AppDbContext : DbContext
 {
 	public DbSet<User> Users { get; set; }
     public DbSet<Match> Matches { get; set; }
-    public DbSet<Gamble> Gambles { get; set; }
+    public DbSet<Gamble> Gamble { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{

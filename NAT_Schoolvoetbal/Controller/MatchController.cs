@@ -201,7 +201,7 @@ namespace APiTest
                 dollars = betAmount
             };
 
-            dbContext.Gambles.Add(newBet);
+            dbContext.Gamble.Add(newBet);
             dbContext.SaveChanges();
         }
     }
