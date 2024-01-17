@@ -1,6 +1,6 @@
 using APiTest;
 using System;
-
+using System.Net.Http.Headers;
 class Program
 {
     private static bool isLoggedIn = false;
@@ -11,7 +11,6 @@ class Program
         {
             if (isLoggedIn)
             {
-                // Opties voor ingelogde gebruikers
                 Console.WriteLine("Kies een optie:");
                 Console.WriteLine("1. 4SDollars inzetten");
                 Console.WriteLine("2. Wedstrijden bekijken");
@@ -97,15 +96,16 @@ class Program
 
     static void Matches()
     {
-        // Add your API call here
-        // Example code:
-        MatchController matchController = new MatchController();
-        string apiResponse = matchController.GetApiResponse();
+        Console.Clear();
 
-        Console.WriteLine("API Response:");
-        Console.WriteLine(apiResponse);
-        Console.WriteLine("Press any key to continue...");
-        Console.ReadKey();
+        // Call the function in MatchController.cs
+        MatchController matchController = new MatchController();
+        matchController.GetMatches().Wait();
+        
+        Console.WriteLine("");
+        Console.WriteLine("Druk op enter om door te gaan...");
+        Console.ReadLine();
+        Console.Clear();
     }
 
     // Methode om het wachtwoord in te voeren zonder het weer te geven
