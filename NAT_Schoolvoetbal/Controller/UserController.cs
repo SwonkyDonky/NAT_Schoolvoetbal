@@ -60,13 +60,7 @@ public class UserController
 
             if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
             {
-                // Set the console color to green
-                Console.ForegroundColor = ConsoleColor.Green;
-
-                Console.WriteLine($"Welkom, {user.Email}! Balans in 4SDollars: {user.Sdollars}");
-
-                // Reset the console color to default
-                Console.ResetColor();
+                Program.SetCurrentUser(user);
 
                 // Generate a unique session ID (you can use a more robust method in a production environment)
                 sessionId = Guid.NewGuid().GetHashCode();

@@ -1,10 +1,12 @@
 using APiTest;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using System;
 using System.Net.Http.Headers;
 class Program
 {
     private static bool isLoggedIn = false;
-
+    private static User currentUser;
     static void Main(string[] args)
     {
         int currentSessionId = 0;
@@ -13,6 +15,10 @@ class Program
         {
             if (isLoggedIn)
             {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Welkom, {currentUser.Email}! Balans in 4SDollars: {currentUser.Sdollars}");
+                Console.ResetColor();
+
                 Console.WriteLine("Kies een optie:");
                 Console.WriteLine("1. 4SDollars inzetten");
                 Console.WriteLine("2. Check of je gewonnen hebt!");
@@ -107,6 +113,7 @@ class Program
         Console.WriteLine("");
         Console.WriteLine("Op welke wedstrijd wil je 4SDollars inzetten? (typ het exact uit zoals hierboven staat)");
         string chosenMatch = Console.ReadLine();
+        Console.WriteLine("");
 
         // Get match details from the local database
         Match selectedMatch = matchController.GetMatchByName(chosenMatch);
@@ -126,6 +133,11 @@ class Program
     static void Check()
     {
         // Code for checking if you won
+    }
+
+    public static void SetCurrentUser(User user)
+    {
+        currentUser = user;
     }
 
     static string ReadPassword()

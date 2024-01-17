@@ -152,6 +152,7 @@ namespace APiTest
             Console.WriteLine($"2. {match.team2_name}");
 
             string teamChoice = Console.ReadLine();
+            Console.WriteLine("");
 
             if (teamChoice == "1" || teamChoice == "2")
             {
@@ -170,13 +171,19 @@ namespace APiTest
                     // Call a method to save the bet to the database
                     SaveBetToDatabase(user.Id, match.id, teamName, betAmount);
 
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Blue;
                     Console.WriteLine($"Inzet van {betAmount} 4SDollars op {teamName} in de wedstrijd tussen {match.team1_name} en {match.team2_name} geplaatst.");
+                    Console.ResetColor();
 
                     // Update the user's SDollars after placing the bet
                     user.Sdollars -= betAmount;
 
                     // Save the updated user to the database
                     dbContext.SaveChanges();
+
+                    // Update the currentUser with the latest information
+                    Program.SetCurrentUser(user);
                 }
                 else
                 {
