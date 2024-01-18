@@ -201,19 +201,26 @@ class Program
 
             if (key.Key == ConsoleKey.Backspace && password.Length > 0)
             {
-                // Verwijder het laatst ingevoerde karakter
+                // Remove the last entered character
                 password = password.Remove(password.Length - 1, 1);
-                Console.Write("\b \b"); // Wis het karakter op het scherm
+                Console.Write("\b \b"); // Clear the character on the screen
             }
             else if (key.Key != ConsoleKey.Enter)
             {
-                password += key.KeyChar;
-                Console.Write("*");
+                // Check if the entered character is a letter, number, or special character
+                if (char.IsLetterOrDigit(key.KeyChar) || char.IsSymbol(key.KeyChar) || char.IsPunctuation(key.KeyChar))
+                {
+                    password += key.KeyChar;
+                    Console.Write("*");
+                }
+                else
+                {
+                    Console.Beep(); // Beep to indicate an invalid character
+                }
             }
         } while (key.Key != ConsoleKey.Enter);
 
         Console.WriteLine();
         return password;
     }
-
 }
