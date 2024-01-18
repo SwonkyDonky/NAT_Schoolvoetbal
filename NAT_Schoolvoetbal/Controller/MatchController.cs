@@ -211,5 +211,96 @@ namespace APiTest
             dbContext.Gamble.Add(newBet);
             dbContext.SaveChanges();
         }
+
+        public async Task<List<Match>> GetMatchResults()
+        {
+            // Fetch the raw JSON code for match results
+            using (HttpClient httpClient = new HttpClient(new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+            }))
+            {
+                try
+                {
+                    string apiUrl = "http://localhost:8000/api/results";
+                    string bearerToken = "xpLeZU8FEBM0ooL6mdQb0StHFiLy57N9gVXAWgj0b6610335";
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+                    httpClient.DefaultRequestHeaders.Accept.Clear();
+                    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    HttpResponseMessage response = await httpClient.GetAsync(apiUrl);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Parse the JSON response into a list of Match objects
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        List<Match> matchResults = JsonConvert.DeserializeObject<List<Match>>(apiResponse);
+                        return matchResults;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+            }
+
+            return null;
+        }
+
+        public void ProcessWinningBets(Match matchResult)
+        {
+            var dbContext = new AppDbContext();
+
+            // Get all bets for this match from the local database
+            List<Gamble> bets = dbContext.Gamble.Where(b => b.match_id == matchResult.id).ToList();
+
+            foreach (Gamble bet in bets)
+            {
+                // Check if the user's bet matches the winning team
+                string winningTeamName = GetWinningTeamName(matchResult);
+
+                if (bet.team_name == winningTeamName)
+                {
+                    // The user won the bet, update their Sdollars
+                    User user = dbContext.Users.FirstOrDefault(u => u.Id == bet.user_id);
+
+                    if (user != null)
+                    {
+                        user.Sdollars += 2 * bet.dollars; // Double the bet amount as winnings
+                        dbContext.SaveChanges();
+
+                        Console.WriteLine($"User {user.Email} won {2 * bet.dollars} Sdollars on match {matchResult.id}!");
+
+                        Program.SetCurrentUser(user);
+                    }
+                }
+                else
+                {
+                    // The user lost the bet
+                    Console.WriteLine($"User {bet.user_id} lost {bet.dollars} Sdollars on match {matchResult.id}.");
+                }
+            }
+        }
+
+        private string GetWinningTeamName(Match matchResult)
+        {
+            // Logic to determine the winning team's name based on match result
+
+            if (matchResult.team1_score.HasValue && matchResult.team2_score.HasValue)
+            {
+                if (matchResult.team1_score > matchResult.team2_score)
+                {
+                    return matchResult.team1_name;
+                }
+                else if (matchResult.team1_score < matchResult.team2_score)
+                {
+                    return matchResult.team2_name;
+                }
+            }
+
+            return "NoWinner";
+        }
+
     }
 }

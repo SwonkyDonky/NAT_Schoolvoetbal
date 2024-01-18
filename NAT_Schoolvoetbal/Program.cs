@@ -129,11 +129,33 @@ class Program
         }
     }
 
-
     static void Check()
     {
-        // Code for checking if you won
+        Console.Clear();
+
+        MatchController matchController = new MatchController();
+
+        // Call the function to get the results of the matches
+        List<Match> matchResults = matchController.GetMatchResults().Result;
+
+        if (matchResults != null)
+        {
+            // Iterate through the match results and process winning bets
+            foreach (Match matchResult in matchResults)
+            {
+                // Call a method to check and process winning bets for this match result
+                matchController.ProcessWinningBets(matchResult);
+            }
+
+            Console.WriteLine("Winning bets processed.");
+            Console.WriteLine("");
+        }
+        else
+        {
+            Console.WriteLine("Failed to retrieve match results.");
+        }
     }
+
 
     public static void SetCurrentUser(User user)
     {
