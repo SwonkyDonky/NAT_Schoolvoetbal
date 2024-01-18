@@ -34,7 +34,7 @@ class Program
                         break;
                     case "2":
                         Console.Clear();
-                        Check();
+                        Check(currentUser);
                         break;
                     case "3":
                         Console.Clear();
@@ -129,7 +129,7 @@ class Program
         }
     }
 
-    static void Check()
+    static void Check(User currentUser)
     {
         Console.Clear();
 
@@ -140,21 +140,21 @@ class Program
 
         if (matchResults != null)
         {
-            // Iterate through the match results and process winning bets
+            // Iterate through the match results and process winning bets for the current user
             foreach (Match matchResult in matchResults)
             {
                 // Call a method to check and process winning bets for this match result
-                matchController.ProcessWinningBets(matchResult);
+                matchController.ProcessWinningBets(matchResult, currentUser);
             }
 
             Console.WriteLine("Winning bets processed.");
-            Console.WriteLine("");
         }
         else
         {
             Console.WriteLine("Failed to retrieve match results.");
         }
     }
+
 
 
     public static void SetCurrentUser(User user)

@@ -22,7 +22,7 @@ namespace APiTest
                 try
                 {
                     string apiUrl = "http://localhost:8000/api/upcoming-matches";
-                    string bearerToken = "xpLeZU8FEBM0ooL6mdQb0StHFiLy57N9gVXAWgj0b6610335";
+                    string bearerToken = "y2QLYt2R4etI8qWuAZR8zOG63AJD8pL0tGLC8sXTf9f76c60";
                     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
                     httpClient.DefaultRequestHeaders.Accept.Clear();
@@ -223,7 +223,7 @@ namespace APiTest
                 try
                 {
                     string apiUrl = "http://localhost:8000/api/results";
-                    string bearerToken = "xpLeZU8FEBM0ooL6mdQb0StHFiLy57N9gVXAWgj0b6610335";
+                    string bearerToken = "y2QLYt2R4etI8qWuAZR8zOG63AJD8pL0tGLC8sXTf9f76c60";
                     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
                     httpClient.DefaultRequestHeaders.Accept.Clear();
@@ -248,14 +248,16 @@ namespace APiTest
             return null;
         }
 
-        public void ProcessWinningBets(Match matchResult)
+        public void ProcessWinningBets(Match matchResult, User currentUser)
         {
             var dbContext = new AppDbContext();
 
-            // Get all bets for this match from the local database
-            List<Gamble> bets = dbContext.Gamble.Where(b => b.match_id == matchResult.id).ToList();
+            // Get all bets for this match from the local database for the current user
+            List<Gamble> userBets = dbContext.Gamble
+                .Where(b => b.match_id == matchResult.id && b.user_id == currentUser.Id)
+                .ToList();
 
-            foreach (Gamble bet in bets)
+            foreach (Gamble bet in userBets.ToList())
             {
                 // Check if the user's bet matches the winning team
                 string winningTeamName = GetWinningTeamName(matchResult);
@@ -263,25 +265,30 @@ namespace APiTest
                 if (bet.team_name == winningTeamName)
                 {
                     // The user won the bet, update their Sdollars
-                    User user = dbContext.Users.FirstOrDefault(u => u.Id == bet.user_id);
+                    currentUser.Sdollars += 2 * bet.dollars; // Double the bet amount as winnings
+                    dbContext.SaveChanges();
 
-                    if (user != null)
-                    {
-                        user.Sdollars += 2 * bet.dollars; // Double the bet amount as winnings
-                        dbContext.SaveChanges();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"User {currentUser.Email} won {2 * bet.dollars} 4Sdollars on match {matchResult.id}! (Betted on Team {bet.team_name})");
+                    Console.ResetColor();
 
-                        Console.WriteLine($"User {user.Email} won {2 * bet.dollars} Sdollars on match {matchResult.id}!");
+                    // Update the currentUser with the latest information
+                    Program.SetCurrentUser(currentUser);
 
-                        Program.SetCurrentUser(user);
-                    }
+                    // Remove the winning bet from the database
+                    dbContext.Gamble.Remove(bet);
+                    dbContext.SaveChanges();
                 }
                 else
                 {
                     // The user lost the bet
-                    Console.WriteLine($"User {bet.user_id} lost {bet.dollars} Sdollars on match {matchResult.id}.");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"User {currentUser.Id} lost {bet.dollars} 4Sdollars on match {matchResult.id}. (Betted on Team {bet.team_name})");
+                    Console.ResetColor();
                 }
             }
         }
+
 
         private string GetWinningTeamName(Match matchResult)
         {
