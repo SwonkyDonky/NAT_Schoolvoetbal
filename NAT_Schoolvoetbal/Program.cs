@@ -168,6 +168,11 @@ class Program
         if (currentUser != null)
         {
             currentUser.Sdollars += 50;
+            
+            // Save the updated user information to the database
+            UserController userController = new UserController();
+            userController.UpdateUser(currentUser);
+
             Console.WriteLine("Cheat successful. 50 Sdollars added to your account.");
         }
         else

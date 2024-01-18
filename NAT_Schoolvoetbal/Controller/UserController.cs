@@ -80,4 +80,25 @@ public class UserController
             }
         }
     }
+
+    public void UpdateUser(User updatedUser)
+    {
+        using (var dbContext = new AppDbContext())
+        {
+            var existingUser = dbContext.Users.FirstOrDefault(u => u.Id == updatedUser.Id);
+
+            if (existingUser != null)
+            {
+                // Update user properties
+                existingUser.Sdollars = updatedUser.Sdollars;
+
+                // Save changes to the database
+                dbContext.SaveChanges();
+            }
+            else
+            {
+                Console.WriteLine("User not found in the database.");
+            }
+        }
+    }
 }

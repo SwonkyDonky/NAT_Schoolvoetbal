@@ -22,7 +22,7 @@ namespace APiTest
                 try
                 {
                     string apiUrl = "http://localhost:8000/api/upcoming-matches";
-                    string bearerToken = "y2QLYt2R4etI8qWuAZR8zOG63AJD8pL0tGLC8sXTf9f76c60";
+                    string bearerToken = "lOnNQbLd5LWWHv0v02dSYzjxoTmMsm1iqPfjfkooba2df128";
                     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
                     httpClient.DefaultRequestHeaders.Accept.Clear();
@@ -44,6 +44,8 @@ namespace APiTest
                         // Display and save the new matches
                         foreach (Match match in newMatches)
                         {
+                            match.id = match.id;
+
                             // Check if a match with the same team names already exists in the database
                             bool matchExists = existingMatches.Any(
                                 m => m.team1_name == match.team1_name && m.team2_name == match.team2_name
@@ -84,6 +86,8 @@ namespace APiTest
             var dbContext = new AppDbContext();
             try
             {
+                match.id = match.id;
+
                 // Check if the match already exists in the database
                 bool matchExists = dbContext.Matches.Any(m => m.id == match.id);
 
@@ -92,8 +96,6 @@ namespace APiTest
                     // Add the new match to the database
                     dbContext.Matches.Add(match);
                     dbContext.SaveChanges();
-
-                    Console.WriteLine($"Match saved to the database: {match.team1_name} vs {match.team2_name}");
                 }
                 else
                 {
@@ -223,7 +225,7 @@ namespace APiTest
                 try
                 {
                     string apiUrl = "http://localhost:8000/api/results";
-                    string bearerToken = "y2QLYt2R4etI8qWuAZR8zOG63AJD8pL0tGLC8sXTf9f76c60";
+                    string bearerToken = "lOnNQbLd5LWWHv0v02dSYzjxoTmMsm1iqPfjfkooba2df128";
                     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
                     httpClient.DefaultRequestHeaders.Accept.Clear();
@@ -269,7 +271,6 @@ namespace APiTest
 
                     // Remove the bet from the database
                     dbContext.Gamble.Remove(tieBet);
-                    Console.WriteLine($"Bet removed from the database. ID: {tieBet.id}");
                 }
 
                 // Save changes to the database after processing bets for a tie
@@ -282,8 +283,6 @@ namespace APiTest
             List<Gamble> userBets = dbContext.Gamble
                 .Where(b => b.match_id == matchResult.id && b.user_id == currentUser.Id)
                 .ToList();
-
-            Console.WriteLine($"Number of bets for user {currentUser.Id} on match {matchResult.id}: {userBets.Count}");
 
             foreach (Gamble bet in userBets.ToList())
             {
@@ -312,7 +311,6 @@ namespace APiTest
                 }
                 // Remove the winning bet from the database
                 dbContext.Gamble.Remove(bet);
-                Console.WriteLine($"Bet removed from the database. ID: {bet.id}");
             }
             // Save changes to the database after processing all bet
             dbContext.SaveChanges();
