@@ -24,6 +24,7 @@ class Program
                 Console.WriteLine("2. Check of je gewonnen hebt!");
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("3. Uitloggen");
+                Console.ResetColor();
 
                 string choice = Console.ReadLine();
 
