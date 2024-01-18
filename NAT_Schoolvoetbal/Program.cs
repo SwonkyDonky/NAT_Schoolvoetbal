@@ -45,7 +45,6 @@ class Program
                     case "XD":
                         Console.Clear();
                         Cheat();
-                        Console.WriteLine("Uitgelogd.");
                         break;
                     default:
                         Console.WriteLine("Ongeldige keuze. Probeer opnieuw.");
@@ -173,7 +172,9 @@ class Program
             UserController userController = new UserController();
             userController.UpdateUser(currentUser);
 
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("Cheat successful. 50 Sdollars added to your account.");
+            Console.ResetColor();
         }
         else
         {
