@@ -252,10 +252,38 @@ namespace APiTest
         {
             var dbContext = new AppDbContext();
 
+            // Check if the match is a tie
+            if (GetWinningTeamName(matchResult) == "Tie")
+            {
+                // Get all bets for the current user on this match
+                List<Gamble> userBetsOnTie = dbContext.Gamble
+                    .Where(b => b.match_id == matchResult.id && b.user_id == currentUser.Id)
+                    .ToList();
+
+                Console.WriteLine($"Match {matchResult.id} is a tie. Processing bets for user {currentUser.Id}.");
+
+                foreach (Gamble tieBet in userBetsOnTie)
+                {
+                    // The user lost the bet
+                    Console.WriteLine($"User {currentUser.Id} lost {tieBet.dollars} Sdollars on match {matchResult.id}.");
+
+                    // Remove the bet from the database
+                    dbContext.Gamble.Remove(tieBet);
+                    Console.WriteLine($"Bet removed from the database. ID: {tieBet.id}");
+                }
+
+                // Save changes to the database after processing bets for a tie
+                dbContext.SaveChanges();
+
+                return;
+            }
+
             // Get all bets for this match from the local database for the current user
             List<Gamble> userBets = dbContext.Gamble
                 .Where(b => b.match_id == matchResult.id && b.user_id == currentUser.Id)
                 .ToList();
+
+            Console.WriteLine($"Number of bets for user {currentUser.Id} on match {matchResult.id}: {userBets.Count}");
 
             foreach (Gamble bet in userBets.ToList())
             {
@@ -274,10 +302,6 @@ namespace APiTest
 
                     // Update the currentUser with the latest information
                     Program.SetCurrentUser(currentUser);
-
-                    // Remove the winning bet from the database
-                    dbContext.Gamble.Remove(bet);
-                    dbContext.SaveChanges();
                 }
                 else
                 {
@@ -286,28 +310,36 @@ namespace APiTest
                     Console.WriteLine($"User {currentUser.Id} lost {bet.dollars} 4Sdollars on match {matchResult.id}. (Betted on Team {bet.team_name})");
                     Console.ResetColor();
                 }
+                // Remove the winning bet from the database
+                dbContext.Gamble.Remove(bet);
+                Console.WriteLine($"Bet removed from the database. ID: {bet.id}");
             }
+            // Save changes to the database after processing all bet
+            dbContext.SaveChanges();
         }
 
 
         private string GetWinningTeamName(Match matchResult)
         {
-            // Logic to determine the winning team's name based on match result
-
-            if (matchResult.team1_score.HasValue && matchResult.team2_score.HasValue)
+            // Check if the match is a tie (both team scores are null or equal)
+            if (matchResult.team1_score == null && matchResult.team2_score == null ||
+                matchResult.team1_score == matchResult.team2_score)
             {
-                if (matchResult.team1_score > matchResult.team2_score)
-                {
-                    return matchResult.team1_name;
-                }
-                else if (matchResult.team1_score < matchResult.team2_score)
-                {
-                    return matchResult.team2_name;
-                }
+                return "Tie";
             }
 
+            // Check if there is a winning team based on match result
+            if (matchResult.team1_score > matchResult.team2_score)
+            {
+                return matchResult.team1_name;
+            }
+            else if (matchResult.team1_score < matchResult.team2_score)
+            {
+                return matchResult.team2_name;
+            }
+
+            // If no winner is determined, return a value indicating no winner
             return "NoWinner";
         }
-
     }
 }

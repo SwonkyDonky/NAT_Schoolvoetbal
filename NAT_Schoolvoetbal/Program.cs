@@ -42,6 +42,11 @@ class Program
                         SessionManager.RemoveSession(currentSessionId);  // Verwijder de huidige sessie bij uitloggen
                         Console.WriteLine("Uitgelogd.");
                         break;
+                    case "XD":
+                        Console.Clear();
+                        Cheat();
+                        Console.WriteLine("Uitgelogd.");
+                        break;
                     default:
                         Console.WriteLine("Ongeldige keuze. Probeer opnieuw.");
                         break;
@@ -152,6 +157,22 @@ class Program
         else
         {
             Console.WriteLine("Failed to retrieve match results.");
+        }
+    }
+
+    static void Cheat()
+    {
+        Console.Clear();
+
+        // Ensure that only the current user can cheat
+        if (currentUser != null)
+        {
+            currentUser.Sdollars += 50;
+            Console.WriteLine("Cheat successful. 50 Sdollars added to your account.");
+        }
+        else
+        {
+            Console.WriteLine("Cheat failed. No user logged in.");
         }
     }
 
