@@ -173,7 +173,7 @@ class Program
             userController.UpdateUser(currentUser);
 
             Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("Cheat successful. 50 Sdollars added to your account.");
+            Console.WriteLine("Cheat successful. 50 4Sdollars added to your account.");
             Console.ResetColor();
         }
         else
