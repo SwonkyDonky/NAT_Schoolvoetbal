@@ -22,6 +22,7 @@ class Program
                 Console.WriteLine("Kies een optie:");
                 Console.WriteLine("1. 4SDollars inzetten");
                 Console.WriteLine("2. Check of je gewonnen hebt!");
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("3. Uitloggen");
 
                 string choice = Console.ReadLine();

@@ -22,8 +22,6 @@ namespace APiTest
                 try
                 {
                     string apiUrl = "http://localhost:8000/api/upcoming-matches";
-                    string bearerToken = "lOnNQbLd5LWWHv0v02dSYzjxoTmMsm1iqPfjfkooba2df128";
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
                     httpClient.DefaultRequestHeaders.Accept.Clear();
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -225,8 +223,6 @@ namespace APiTest
                 try
                 {
                     string apiUrl = "http://localhost:8000/api/results";
-                    string bearerToken = "lOnNQbLd5LWWHv0v02dSYzjxoTmMsm1iqPfjfkooba2df128";
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
                     httpClient.DefaultRequestHeaders.Accept.Clear();
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
