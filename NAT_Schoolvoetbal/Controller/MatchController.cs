@@ -258,12 +258,12 @@ namespace APiTest
                     .Where(b => b.match_id == matchResult.id && b.user_id == currentUser.Id)
                     .ToList();
 
-                Console.WriteLine($"Match {matchResult.id} is a tie. Processing bets for user {currentUser.Id}.");
-
                 foreach (Gamble tieBet in userBetsOnTie)
                 {
                     // The user lost the bet
-                    Console.WriteLine($"User {currentUser.Id} lost {tieBet.dollars} Sdollars on match {matchResult.id}.");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"User {currentUser.Id} lost {tieBet.dollars} Sdollars on match {matchResult.id}. (Match is a tie)");
+                    Console.ResetColor();
 
                     // Remove the bet from the database
                     dbContext.Gamble.Remove(tieBet);
